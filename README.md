@@ -22,14 +22,14 @@ The following parameters are used for both **Auto Recurrence Quantification Anal
 | **`radius`**   | `float`      | `0.1`       | Recurrence radius: Threshold value for determining recurrences. Smaller values are stricter.    |
 | **`tmin`**     | `int`        | `2`         | Theiler window: Minimum time separation to exclude near-diagonal recurrences (removes artifacts).|
 | **`minl`**     | `int`        | `2`         | Minimum line length: The shortest line considered for calculating determinism and related metrics. |
-| **`doPlots`**  | `bool`       | `True`      | Whether to generate and display plots:                                                         |
+| **`doPlots`**  | `bool`       | `False`      | Whether to generate and display plots:                                                         |
 |                 |              |             | - `True`: Generate plots.                                                                      |
 |                 |              |             | - `False`: Do not generate plots.                                                             |
-| **`plotMode`** | `str`        | `'recurrence_with_timeseries'` | Specifies the type of plot to generate:                                          |
+| **`plotMode`** | `str`        | `'recurrence'` | Specifies the type of plot to generate:                                          |
 |                 |              |             | - `'recurrence'`: Basic recurrence or cross-recurrence plot only.                              |
 |                 |              |             | - `'recurrence_with_timeseries'`: Plot the recurrence plot with the time series underneath or alongside. |
 |                 |              |             | - `'phase_space'`: Plot the recurrence plot alongside a 2D/3D phase space reconstruction.      |
-| **`phaseSpace`** | `bool`     | `True`      | Whether to include the phase space reconstruction:                                             |
+| **`phaseSpace`** | `bool`     | `False`      | Whether to include the phase space reconstruction:                                             |
 |                 |              |             | - `True`: Generate a 2D or 3D phase space plot.                                                |
 |                 |              |             | - `False`: Skip phase space reconstruction.                                                   |
 | **`doStatsFile`** | `bool`    | `False`     | Whether to write RQA statistics to a file (`RQA_Stats.csv`):                                   |
