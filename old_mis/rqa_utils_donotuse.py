@@ -1,5 +1,6 @@
 import numpy as np
 import scipy.stats as stats
+import torch
 
 def xRQA_dist(a, b, dim, lag):
     """
@@ -365,6 +366,205 @@ def xRQA_stats(d, rescale, rad, tmin, minl):
         'maxl_found': maxl_found,
         'trend1': trend1,
         'trend2': trend2,
+        'llmnsd': llmnsd
+    }
+
+    mats = {
+        'rescale': rescale,
+        'rad': rad,
+        'tmin': tmin,
+        'minl': minl,
+        'td': td,
+        'll': ll,
+        'lh': lh
+    }
+
+    return td, rs, mats, err_code
+
+
+def xRQA_dist_torch(a, b, dim, lag, device='cuda'):
+    """
+    Compute distances between all points of two vectors using PyTorch.
+
+    Parameters:
+        a (np.ndarray): Data vector 1xN or Nx1.
+        b (np.ndarray): Data vector 1xN or Nx1.
+        dim (int): Embedding dimension (scalar).
+        lag (int): Time lag in samples (scalar).
+        device (str): Device for PyTorch ('cuda' or 'cpu').
+
+    Returns:
+        ds (dict): A dictionary containing:
+            - 'dim': Embedding dimension
+            - 'lag': Time lag
+            - 'd': Distance matrix (Torch Tensor)
+    """
+    # Convert input to torch tensors
+    a = torch.tensor(a, dtype=torch.float32, device=device).view(-1, 1)
+    b = torch.tensor(b, dtype=torch.float32, device=device).view(-1, 1)
+
+    # Check embedding size
+    n = a.size(0)
+    n2 = n - lag * (dim - 1)
+    if n2 <= 0:
+        raise ValueError("Not enough data for these embedding parameters.")
+
+    # Embed vectors
+    if dim > 1:
+        emb_a = torch.cat([a[lag * k : lag * k + n2] for k in range(dim)], dim=1)
+        emb_b = torch.cat([b[lag * k : lag * k + n2] for k in range(dim)], dim=1)
+    else:
+        emb_a = a[:n2]
+        emb_b = b[:n2]
+
+    # Compute pairwise distance matrix
+    dist = torch.cdist(emb_a, emb_b)
+
+    # Return as dictionary
+    ds = {'dim': dim, 'lag': lag, 'd': dist}
+    return ds
+
+def xRQA_radius_torch(dist, rescale, rad, tmin, device='cuda'):
+    """
+    Threshold the distance matrix using PyTorch.
+
+    Parameters:
+        dist (torch.Tensor): Square (NxN) distance matrix.
+        rescale (int): Rescaling option (1=mean, 2=max, else no rescale).
+        rad (float): Threshold radius.
+        tmin (int): Theiler window to exclude diagonals.
+
+    Returns:
+        thrd (torch.Tensor): Thresholded matrix.
+    """
+    # Rescale the distance matrix
+    if rescale == 1:
+        dist = dist / torch.mean(dist)
+    elif rescale == 2:
+        dist = dist / torch.max(dist)
+
+    # Apply threshold
+    thrd = (dist <= rad).to(torch.int8)
+
+    # Apply Theiler window (exclude diagonals within tmin)
+    n = dist.size(0)
+    for i in range(tmin):
+        # Zero out the diagonal at the current offset
+        if i > 0:
+            thrd.diagonal(i).fill_(0)
+            thrd.diagonal(-i).fill_(0)
+        else:
+            thrd.fill_diagonal_(0)
+
+    return thrd
+
+
+def xRQA_line_torch(thrd, tmin):
+    """
+    Find diagonal lines and their lengths in a thresholded matrix using PyTorch.
+
+    Parameters:
+        thrd (torch.Tensor): Thresholded distance matrix.
+        tmin (int): Theiler window.
+
+    Returns:
+        ll (torch.Tensor): Line lengths.
+        maxl_poss (int): Maximum possible line length.
+        npts (int): Total number of points in the plot.
+    """
+    n = thrd.size(0)
+    maxl_poss = n - tmin
+    ll = []
+
+    for offset in range(-n + 1, n):
+        diag = torch.diagonal(thrd, offset=offset)
+        lengths = torch.diff((diag == 1).to(torch.int32)).nonzero()[:, 0]
+        if lengths.numel() > 0:
+            line_lengths = torch.diff(lengths).to(torch.float32)
+            ll.extend(line_lengths)
+
+    npts = thrd.sum().item()  # Total recurrence points
+    return torch.tensor(ll), maxl_poss, npts
+
+import torch
+
+def xRQA_stats_torch(d, rescale, rad, tmin, minl, device='cuda'):
+    """
+    Perform Recurrence Quantification Analysis (RQA) on a distance matrix using PyTorch.
+
+    Parameters:
+        d (torch.Tensor): Distance matrix.
+        rescale (int): Rescale option (1 = mean, 2 = max, other = absolute).
+        rad (float): Threshold radius.
+        tmin (int): Minimum recurrence time (Theiler window).
+        minl (int): Minimum line length for determinism, histogram, and entropy.
+        device (str): Device for PyTorch ('cuda' or 'cpu').
+
+    Returns:
+        td (torch.Tensor): Thresholded distance matrix.
+        rs (dict): Structure containing RQA statistics.
+        mats (dict): Structure containing intermediate matrices and results.
+        err_code (int): Error code (0 if successful, >0 if error occurred).
+    """
+    err_code = 0
+
+    # Move the distance matrix to the specified device
+    d = d.to(device)
+
+    # Threshold the distance matrix
+    td = xRQA_radius_torch(d, rescale, rad, tmin, device=device)
+    if td is None:
+        print("Error in thresholding.")
+        return None, None, None, 1
+
+    # Find all lines and compute trends
+    ll, maxl_poss, npts = xRQA_line_torch(td, tmin)
+    if ll.numel() == 0:
+        print("Error in line counting.")
+        return None, None, None, 2
+
+    # Compute histogram of line lengths
+    ll_np = ll.cpu().numpy()  # Move to CPU for numpy-based operations
+    lh, llmnsd = xRQA_histlines(ll_np, minl)
+    if isinstance(lh, int) and lh == -1:
+        print("Error in creating line histograms.")
+        return None, None, None, 3
+
+    # Compute entropy of line length histogram
+    if lh.size > 1:  # Check if histogram has data
+        entropy = xRQA_entropy(lh[:, 1], maxl_poss - minl + 1)
+        if isinstance(entropy, int) and entropy == -1:
+            print("Error in computing entropy.")
+            return None, None, None, 4
+    else:
+        entropy = [0, 0]
+
+    # Percent recurrence
+    recur = ll.sum().item()
+    perc_rec = 100 * recur / npts
+
+    # Determinism, Max line, and Complexity
+    if lh.size > 1:
+        perc_determ = 100 * np.sum(lh[:, 0] * lh[:, 1]) / recur  # % Determinism
+        maxl_found = np.max(lh[:, 0])  # Maximum line length found
+    else:
+        perc_determ = 0
+        maxl_found = 0
+
+    # Output results into structures
+    rs = {
+        'rescale': rescale,
+        'rad': rad,
+        'tmin': tmin,
+        'minl': minl,
+        'perc_recur': perc_rec,
+        'perc_determ': perc_determ,
+        'npts': npts,
+        'entropy': entropy,
+        'maxl_poss': maxl_poss,
+        'maxl_found': maxl_found,
+        'trend1': None,  # Trend calculations are not included in this version
+        'trend2': None,
         'llmnsd': llmnsd
     }
 

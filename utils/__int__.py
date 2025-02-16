@@ -1,6 +1,5 @@
 # Import functions from each utility module
 from norm_utils import normalize_data
-from rqa_utils import xRQA_dist, xRQA_stats
 from plot_utils import plot_rqa_results
 from output_io_utils  import write_rqa_stats
 

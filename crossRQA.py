@@ -1,4 +1,5 @@
-from utils import norm_utils, rqa_utils, plot_utils, output_io_utils
+from utils import norm_utils, plot_utils, output_io_utils
+from utils import rqa_utils_cpp
 
 def crossRQA(data1, data2, params):
     """
@@ -16,8 +17,10 @@ def crossRQA(data1, data2, params):
     dataX2 = norm_utils.normalize_data(data2, params['norm'])
 
     # Perform RQA computations
-    ds = rqa_utils.xRQA_dist(dataX1, dataX2, params['eDim'], params['tLag'])
-    td, rs, _, err_code = rqa_utils.xRQA_stats(ds['d'], params['rescaleNorm'], params['radius'], params['tmin'], params['minl'])
+    ds = rqa_utils_cpp.rqa_dist(dataX1, dataX2, dim=params['eDim'], lag=params['tLag'])
+
+    # Similarly, you can call xRQA_stats:
+    td, rs, mats, err_code = rqa_utils_cpp.rqa_stats(ds["d"], rescale=params['rescaleNorm'], rad=params['radius'], diag_ignore=0, minl=params['minl'], rqa_mode="cross")
 
     # Print stats
     if err_code == 0:

@@ -1,4 +1,5 @@
-from utils import norm_utils, rqa_utils, plot_utils, output_io_utils
+from utils import norm_utils, plot_utils, output_io_utils
+from utils import rqa_utils_cpp
 
 def autoRQA(data, params):
     """ Auto Recurrence Quantification Analysis """
@@ -6,8 +7,10 @@ def autoRQA(data, params):
     dataX = norm_utils.normalize_data(data, params['norm'])
 
     # Perform RQA computations
-    ds = rqa_utils.xRQA_dist(dataX, dataX, params['eDim'], params['tLag'])
-    td, rs, _, err_code = rqa_utils.xRQA_stats(ds['d'], params['rescaleNorm'], params['radius'], params['tmin'], params['minl'])
+    ds = rqa_utils_cpp.rqa_dist(dataX, dataX, dim=params['eDim'], lag=params['tLag'])
+
+    # Similarly, you can call xRQA_stats:
+    td, rs, mats, err_code = rqa_utils_cpp.rqa_stats(ds["d"], rescale=params['rescaleNorm'], rad=params['radius'], diag_ignore=params['tw'], minl=params['minl'], rqa_mode="auto")
 
     ## Print stats
     if err_code == 0:
