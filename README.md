@@ -20,20 +20,18 @@ The following parameters are used for both **Auto Recurrence Quantification Anal
 |                 |              |             | - `2`: Rescale distances using the **maximum distance**.                                       |
 |                 |              |             | - Other: Do not rescale distances (absolute thresholding).                                     |
 | **`radius`**   | `float`      | `0.1`       | Recurrence radius: Threshold value for determining recurrences. Smaller values are stricter.    |
-| **`tmin`**     | `int`        | `2`         | Theiler window: Minimum time separation to exclude near-diagonal recurrences (removes artifacts).|
+| **`tw`**     | `int`        | `2`         | Theiler window: Minimum time separation to exclude near-diagonal recurrences (removes artifacts).|
 | **`minl`**     | `int`        | `2`         | Minimum line length: The shortest line considered for calculating determinism and related metrics. |
-| **`doPlots`**  | `bool`       | `False`      | Whether to generate and display plots:                                                         |
-|                 |              |             | - `True`: Generate plots.                                                                      |
-|                 |              |             | - `False`: Do not generate plots.                                                             |
 | **`plotMode`** | `str`        | `'recurrence'` | Specifies the type of plot to generate:                                          |
+|                 |              |             | - `'none'`: Do not generate plots.                              |
 |                 |              |             | - `'recurrence'`: Basic recurrence or cross-recurrence plot only.                              |
 |                 |              |             | - `'recurrence_with_timeseries'`: Plot the recurrence plot with the time series underneath or alongside. |
-|                 |              |             | - `'phase_space'`: Plot the recurrence plot alongside a 2D/3D phase space reconstruction.      |
-| **`phaseSpace`** | `bool`     | `False`      | Whether to include the phase space reconstruction:                                             |
-|                 |              |             | - `True`: Generate a 2D or 3D phase space plot.                                                |
-|                 |              |             | - `False`: Skip phase space reconstruction.                                                   |
+| **`pointSize`** | `int`     | `4`      | Size of the points in the recurrence or cross-recurrence plot.                                           |
+| **`showMetrics`** | `bool`     | `True`      | Whether to show RQA statistics in the console:                                             |
+|                 |              |             | - `True`: Show metrics in the console.                                                |
+|                 |              |             | - `False`: Do not show metrics in the console.                                                   |
 | **`doStatsFile`** | `bool`    | `False`     | Whether to write RQA statistics to a file (`RQA_Stats.csv`):                                   |
-|                 |              |             | - `True`: Write the statistics to the file.                                                   |
+|                 |              |             | - `True`: Write the statistics to a file.                                                   |
 |                 |              |             | - `False`: Do not write statistics to a file.                                                 |
 
 ---
@@ -56,11 +54,11 @@ params = {
     'tLag': 15,                         # Time lag
     'rescaleNorm': 1,                   # Rescale using mean distance
     'radius': 0.1,                      # Recurrence radius
-    'tmin': 2,                          # Theiler window
+    'tw': 2,                            # Theiler window
     'minl': 2,                          # Minimum line length
-    'doPlots': True,                    # Generate plots
-    'plotMode': 'recurrence_with_timeseries',  # Recurrence plot with time series
-    'phaseSpace': True,                 # Include phase space reconstruction
+    'plotMode': 'rp-timeseries',        # Recurrence plot with time series
+    'pointSize': 2,                     # Size of points in the plot
+    'showMetrics': True,                # Show metrics in the console
     'doStatsFile': True                 # Write statistics to file
 }
 
@@ -84,11 +82,11 @@ params = {
     'tLag': 15,                         # Time lag
     'rescaleNorm': 1,                   # Rescale using mean distance
     'radius': 0.1,                      # Recurrence radius
-    'tmin': 2,                          # Theiler window
+    'tw': 2,                            # Theiler window
     'minl': 2,                          # Minimum line length
-    'doPlots': True,                    # Generate plots
-    'plotMode': 'phase_space',          # Recurrence plot with phase space reconstruction
-    'phaseSpace': True,                 # Include phase space reconstruction
+    'plotMode': 'rp-timeseries',        # Recurrence plot with time series
+    'pointSize': 2,                     # Size of points in the plot
+    'showMetrics': True,                # Show metrics in the console
     'doStatsFile': True                 # Write statistics to file
 }
 
@@ -100,7 +98,7 @@ crossRQA(data1, data2, params)
 
 ## Parameter Highlights
 
-1. **`tmin` and `minl`**:
+1. **`tw` and `minl`**:
    - Adjust these parameters to filter out diagonal artifacts and short diagonal lines, which may arise from noise or trivial recurrences.
 
 2. **`radius`**:

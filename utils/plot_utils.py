@@ -3,12 +3,15 @@ import matplotlib.gridspec as gridspec
 import numpy as np
 
 def plot_rqa_results(
-    dataX, dataY=None, td=None,
+    dataX=None, dataY=None, td=None,
     plot_mode='rp', point_size=4
 ):
     """
     Plot RQA or CRQA results with aligned RP and TS width.
     """
+
+    ax_ts_x = None
+    ax_ts_y = None
 
     N = len(dataX)
     fig = plt.figure(figsize=(8, 9))  # Squarer figure to accommodate equal width
@@ -45,6 +48,14 @@ def plot_rqa_results(
         ax_ts_y.set_ylabel("Time")
         ax_ts_y.set_xlabel("Y", rotation=0, labelpad=15)
 
-    fig.align_xlabels([ax_rp, ax_ts_x])
-    fig.align_ylabels([ax_rp, ax_ts_y] if dataY is not None else [ax_rp])
+    if 'timeseries' in plot_mode:
+        if ax_ts_x is not None:
+            fig.align_xlabels([ax_rp, ax_ts_x])
+        if ax_ts_y is not None:
+            fig.align_ylabels([ax_rp, ax_ts_y])
+    else:
+        fig.align_xlabels([ax_rp])
+        fig.align_ylabels([ax_rp])
+
+
     plt.show()

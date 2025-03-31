@@ -25,11 +25,12 @@ def autoRQA(data, params):
 
     # Plot results
     # plotMode: 'none', 'rp', 'rp_timeseries',
-    if 'rp' in params['plotMode']:
+    plot_mode = params.get('plotMode', 'rp')
+    if plot_mode == 'rp' or plot_mode == 'rp-timeseries':
         plot_utils.plot_rqa_results(
             dataX=dataX,
             td=td,
-            plot_mode=params['plotMode'],
+            plot_mode=plot_mode,
             point_size=params['pointSize'],
         )
 
