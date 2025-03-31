@@ -24,15 +24,13 @@ def autoRQA(data, params):
         print("Error in RQA computation. Check parameters and data.")
 
     # Plot results
-    if params['doPlots']:
+    # plotMode: 'none', 'rp', 'rp_timeseries',
+    if 'rp' in params['plotMode']:
         plot_utils.plot_rqa_results(
             dataX=dataX,
             td=td,
-            rs=rs,
-            plot_mode=params.get('plotMode', 'recurrence'),  # Default is 'recurrence'
-            phase_space=params.get('phaseSpace', False),    # Default is False
-            eDim=params['eDim'],
-            tLag=params['tLag']
+            plot_mode=params['plotMode'],
+            point_size=params['pointSize'],
         )
 
     # Write stats

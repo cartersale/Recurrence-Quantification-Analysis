@@ -1,78 +1,50 @@
-from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
+import matplotlib.gridspec as gridspec
 import numpy as np
 
-def plot_rqa_results(dataX, dataY=None, td=None, rs=None, plot_mode='recurrence', phase_space=False, eDim=3, tLag=1):
+def plot_rqa_results(
+    dataX, dataY=None, td=None,
+    plot_mode='rp', point_size=4
+):
     """
-    Plot RQA results based on the chosen mode.
-
-    Parameters:
-        dataX (np.ndarray): Time series data for X-axis.
-        dataY (np.ndarray): Time series data for Y-axis (for cross-RQA).
-        td (np.ndarray): Thresholded distance matrix (recurrence or cross-recurrence plot).
-        rs (dict): RQA statistics dictionary (optional for display).
-        plot_mode (str): 
-            'recurrence': Basic recurrence plot.
-            'recurrence_with_timeseries': Recurrence plot with time series underneath or to the side.
-            'phase_space': Recurrence plot with phase space reconstruction.
-        phase_space (bool): True to include a 2D/3D phase space plot.
-        eDim (int): Embedding dimension for phase space.
-        tLag (int): Time lag for phase space.
+    Plot RQA or CRQA results with aligned RP and TS width.
     """
 
-    def reconstruct_phase_space(data, dim, lag):
-        """ Reconstruct phase space using embedding dimension and time lag """
-        n_points = len(data) - (dim - 1) * lag
-        phase_space = np.array([data[i:i + n_points] for i in range(0, dim * lag, lag)]).T
-        return phase_space
+    N = len(dataX)
+    fig = plt.figure(figsize=(8, 9))  # Squarer figure to accommodate equal width
+    gs = gridspec.GridSpec(3, 2, width_ratios=[1, 12], height_ratios=[1, 12, 2], hspace=0.4, wspace=0.2)
 
-    plt.figure(figsize=(10, 8))
+    # === Recurrence Plot ===
+    ax_rp = fig.add_subplot(gs[1, 1])
+    ax_rp.set_facecolor('#b0c4de')  # Light Steel Blue, a lighter navy shade
 
-    # Plot 1: Recurrence or Cross-Recurrence Plot
-    plt.subplot(2, 2, 1)
-    plt.imshow((1 - td).T, cmap='gray', origin='lower')
-    title = "Cross-Recurrence Plot" if dataY is not None else "Recurrence Plot"
-    plt.title(title)
-    plt.xlabel("X(i)")
-    plt.ylabel("Y(j)" if dataY is not None else "X(j)")
+    recur_y, recur_x = np.where(td == 1)
+    ax_rp.scatter(recur_x, recur_y, c='blue', s=point_size, edgecolors='none')
+    ax_rp.set_xlim([0, N])
+    ax_rp.set_ylim([0, N])
+    ax_rp.set_title("Cross-Recurrence Plot" if dataY is not None else "Recurrence Plot", pad=8)
+    ax_rp.set_xlabel("X(i)")
+    ax_rp.set_ylabel("Y(j)" if dataY is not None else "X(j)")
 
-    # Optionally display RQA statistics
-    if rs:
-        plt.figtext(0.5, 0.02, f"%REC: {rs['perc_recur']:.2f} | %DET: {rs['perc_determ']:.2f} | "
-                               f"MAXLINE: {rs['maxl_found']:.0f} | MEANLINE: {rs['llmnsd'][0]:.0f} | "
-                               f"ENTROPY: {rs['entropy'][0]:.2f}",
-                    ha="center", fontsize=10)
+    # === Time Series X ===
+    if 'timeseries' in plot_mode:
+        ax_ts_x = fig.add_subplot(gs[2, 1], sharex=ax_rp)
+        ax_ts_x.plot(np.arange(N), dataX[:N], color='tab:blue')
+        ax_ts_x.set_xlim([0, N])
+        ax_ts_x.set_title("Time Series X", fontsize=10)
+        ax_ts_x.set_xlabel("Time")
+        ax_ts_x.set_ylabel("X", rotation=0, labelpad=15)
 
-    # Plot 2: Time Series - Underneath or to the side
-    if plot_mode == 'recurrence_with_timeseries':
-        plt.subplot(2, 2, 3)
-        plt.plot(dataX, 'b-')
-        plt.title("Time Series (X)")
-        plt.xlabel("Sample")
-        plt.ylabel("Amplitude")
-        if dataY is not None:
-            plt.subplot(2, 2, 4)
-            plt.plot(dataY, 'g-')
-            plt.title("Time Series (Y)")
-            plt.xlabel("Sample")
-            plt.ylabel("Amplitude")
+    # === Time Series Y ===
+    if dataY is not None and 'timeseries' in plot_mode:
+        ax_ts_y = fig.add_subplot(gs[1, 0], sharey=ax_rp)
+        ax_ts_y.plot(dataY[:N], np.arange(N), color='tab:blue')
+        ax_ts_y.invert_xaxis()
+        ax_ts_y.set_ylim([0, N])
+        ax_ts_y.set_title("Time Series Y", fontsize=10)
+        ax_ts_y.set_ylabel("Time")
+        ax_ts_y.set_xlabel("Y", rotation=0, labelpad=15)
 
-    # Plot 3: Phase Space Reconstruction
-    if phase_space:
-        phase_data = reconstruct_phase_space(dataX, eDim, tLag)
-        if eDim == 2:
-            plt.subplot(2, 2, 4)
-            plt.plot(phase_data[:, 0], phase_data[:, 1], 'b-')
-            plt.title("2D Phase Space Reconstruction")
-            plt.xlabel("X(t)")
-            plt.ylabel(f"X(t + {tLag})")
-        elif eDim >= 3:
-            ax = plt.subplot(2, 2, 4, projection='3d')
-            ax.plot(phase_data[:, 0], phase_data[:, 1], phase_data[:, 2], 'b-')
-            ax.set_title("3D Phase Space Reconstruction")
-            ax.set_xlabel("X(t)")
-            ax.set_ylabel(f"X(t + {tLag})")
-            ax.set_zlabel(f"X(t + {2 * tLag})")
-
-    plt.tight_layout()
+    fig.align_xlabels([ax_rp, ax_ts_x])
+    fig.align_ylabels([ax_rp, ax_ts_y] if dataY is not None else [ax_rp])
     plt.show()
