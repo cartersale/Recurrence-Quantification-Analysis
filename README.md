@@ -96,16 +96,20 @@ crossRQA(data1, data2, params)
 
 ---
 
-## Parameter Highlights
+## Set Up Instructions
+This repository includes C++ extensions that need to be compiled before use. To compile the code, ensure you have a C++ compiler installed and then run the following from the root directory:
+```python
+pip install .
+```
 
-1. **`tw` and `minl`**:
-   - Adjust these parameters to filter out diagonal artifacts and short diagonal lines, which may arise from noise or trivial recurrences.
+## Related Resources
 
-2. **`radius`**:
-   - This controls how "close" points in phase space need to be to count as recurrent. Smaller radii result in sparser recurrence plots.
+New to RQA? For guidance on using RQA to explore human behaviour in social and behavioural research, please refer to the following chapter: 
 
-3. **`plotMode`**:
-   - Flexible visualization: Users can choose basic recurrence plots, add time series, or include phase space reconstructions.
+Macpherson, C., Richardson, M., & Kallen, R. W. (2024). Advanced quantitative approaches: Linear and non-linear time-series analyses. In Cambridge handbook of research methods and statistics for the social and behavioral sciences (Vol. 3). Cambridge University Press (CUP).
 
-4. **`doStatsFile`**:
-   - Enables automatic output of RQA statistics into a CSV file for further analysis.
+Alongside an associated tutorial on [Linear and Nonlinear Time Series Analysis](https://github.com/xkiwilabs/Linear-NonLinear-TSAnalysis)
+
+## References
+
+This code is based on a [matlab toolbox](https://github.com/xkiwilabs/MATLAB-Toolboxes/tree/master/RQAToolbox) developed by Bruce Kay (2003-2004, University of Connecticut) and Mike Richardson (2004-2009, University of Connecticut and University of Cincinnati), with contributions from countless collaborators. 
