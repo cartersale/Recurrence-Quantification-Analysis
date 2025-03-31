@@ -24,10 +24,12 @@ def crossRQA(data1, data2, params):
 
     # Print stats
     if err_code == 0:
-        print(f"REC: {float(rs['perc_recur']):.3f} | DET: {float(rs['perc_determ']):.3f} | MAXLINE: {float(rs['maxl_found']):.2f}")
-        print(f"Lines (mean): {float(rs['llmnsd'][0]):.2f} | Lines (sd): {float(rs['llmnsd'][2]):.2f} | Lines (count): {float(rs['llmnsd'][2]):.2f}")
-        print(f"ENTR: {float(rs['entropy'][0]):.3f} | LAM: {float(rs['laminarity']):.3f} | TT: {float(rs['trapping_time']):.3f}")
-        print(f"Vmax: {float(rs['vmax']):.2f} | Divergence: {float(rs['divergence']):.3f} | TREND: {float(rs['trend1']):.3f} and {float(rs['trend2']):.3f}")
+        if params['showMetrics']:
+            print(f"%REC: {float(rs['perc_recur']):.3f} | %DET: {float(rs['perc_determ']):.3f} | MaxLine: {float(rs['maxl_found']):.2f}")
+            print(f"Mean Line Length: {float(rs['mean_line_length']):.2f} | SD Line Length: {float(rs['std_line_length']):.2f} | Line Count): {float(rs['count_line']):.2f}")
+            print(f"ENTR: {float(rs['entropy']):.3f} | LAM: {float(rs['laminarity']):.3f} | TT: {float(rs['trapping_time']):.3f}")
+            print(f"Vmax: {float(rs['vmax']):.2f} | Divergence: {float(rs['divergence']):.3f}") 
+            print(f"Trend_Lower: {float(rs['trend_lower_diag']):.3f} | Trend_Upper {float(rs['trend_upper_diag']):.3f}")
     else:
         print("Error in RQA computation. Check parameters and data.")
 

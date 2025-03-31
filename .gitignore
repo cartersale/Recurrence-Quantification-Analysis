@@ -9,3 +9,5 @@ rqa_analysis.egg-info/PKG-INFO
 rqa_analysis.egg-info/requires.txt
 rqa_analysis.egg-info/SOURCES.txt
 rqa_analysis.egg-info/top_level.txt
+__pycache__/autoRQA.cpython-311.pyc
+__pycache__/crossRQA.cpython-311.pyc
