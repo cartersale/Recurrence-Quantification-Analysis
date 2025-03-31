@@ -24,9 +24,12 @@ def crossRQA(data1, data2, params):
 
     # Print stats
     if err_code == 0:
-        print(f"REC: {rs['perc_recur']:.3f} | DET: {rs['perc_determ']:.3f} | MAXLINE: {rs['maxl_found']:.2f}")
+        print(f"REC: {float(rs['perc_recur']):.3f} | DET: {float(rs['perc_determ']):.3f} | MAXLINE: {float(rs['maxl_found']):.2f}")
+        print(f"Lines (mean): {float(rs['llmnsd'][0]):.2f} | Lines (sd): {float(rs['llmnsd'][2]):.2f} | Lines (count): {float(rs['llmnsd'][2]):.2f}")
+        print(f"ENTR: {float(rs['entropy'][0]):.3f} | LAM: {float(rs['laminarity']):.3f} | TT: {float(rs['trapping_time']):.3f}")
+        print(f"Vmax: {float(rs['vmax']):.2f} | Divergence: {float(rs['divergence']):.3f} | TREND: {float(rs['trend1']):.3f} and {float(rs['trend2']):.3f}")
     else:
-        print("REC: 0.000 | DET: 0.000 | MAXLINE: 0.000")
+        print("Error in RQA computation. Check parameters and data.")
 
     # Plot results
     if params['doPlots']:
