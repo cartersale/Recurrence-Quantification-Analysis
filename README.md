@@ -1,6 +1,8 @@
 # Recurrence Quantification Analysis (RQA) Package
 
-## Parameters Documentation
+This package provides fast and flexible tools for performing Auto Recurrence Quantification Analysis (autoRQA) and Cross Recurrence Quantification Analysis (crossRQA) on time series data. It supports phase space reconstruction, recurrence plot generation, and computation of standard RQA metrics, including %REC, %DET, MaxLine, MeanLine, Entropy, and more.
+
+## Parameters
 
 The following parameters are used for both **Auto Recurrence Quantification Analysis (`autoRQA`)** and **Cross Recurrence Quantification Analysis (`crossRQA`)**.
 
@@ -24,8 +26,8 @@ The following parameters are used for both **Auto Recurrence Quantification Anal
 | **`minl`**     | `int`        | `2`         | Minimum line length: The shortest line considered for calculating determinism and related metrics. |
 | **`plotMode`** | `str`        | `'recurrence'` | Specifies the type of plot to generate:                                          |
 |                 |              |             | - `'none'`: Do not generate plots.                              |
-|                 |              |             | - `'recurrence'`: Basic recurrence or cross-recurrence plot only.                              |
-|                 |              |             | - `'recurrence_with_timeseries'`: Plot the recurrence plot with the time series underneath or alongside. |
+|                 |              |             | - `'rp'`: Basic recurrence or cross-recurrence plot only.                              |
+|                 |              |             | - `'rp-timeseries'`: Plot the recurrence plot with the time series underneath or alongside. |
 | **`pointSize`** | `int`     | `4`      | Size of the points in the recurrence or cross-recurrence plot.                                           |
 | **`showMetrics`** | `bool`     | `True`      | Whether to show RQA statistics in the console:                                             |
 |                 |              |             | - `True`: Show metrics in the console.                                                |
@@ -97,19 +99,19 @@ crossRQA(data1, data2, params)
 ---
 
 ## Set Up Instructions
-This repository includes C++ extensions that need to be compiled before use. To compile the code, ensure you have a C++ compiler installed and then run the following from the root directory:
+This repository includes C++ extensions that need to be compiled before use. To compile the code, ensure you have a C++ compiler installed. Then run the following from the root directory:
 ```python
 pip install .
 ```
 
 ## Related Resources
 
-New to RQA? For guidance on using RQA to explore human behaviour in social and behavioural research, please refer to the following chapter: 
+For guidance on using RQA to explore human behaviour in social and behavioural research: 
 
-Macpherson, C., Richardson, M., & Kallen, R. W. (2024). Advanced quantitative approaches: Linear and non-linear time-series analyses. In Cambridge handbook of research methods and statistics for the social and behavioral sciences (Vol. 3). Cambridge University Press (CUP).
+- Chapter: Macpherson, C., Richardson, M., & Kallen, R. W. (2024). Advanced quantitative approaches: Linear and non-linear time-series analyses. In Cambridge handbook of research methods and statistics for the social and behavioral sciences (Vol. 3). Cambridge University Press (CUP).
 
-Alongside an associated tutorial on [Linear and Nonlinear Time Series Analysis](https://github.com/xkiwilabs/Linear-NonLinear-TSAnalysis)
+- Python tutorial: [Linear and Nonlinear Time Series Analysis](https://github.com/xkiwilabs/Linear-NonLinear-TSAnalysis)
 
 ## References
 
-This code is based on a [matlab toolbox](https://github.com/xkiwilabs/MATLAB-Toolboxes/tree/master/RQAToolbox) developed by Bruce Kay (2003-2004, University of Connecticut) and Mike Richardson (2004-2009, University of Connecticut and University of Cincinnati), with contributions from countless collaborators. 
+This code is based on a [matlab toolbox](https://github.com/xkiwilabs/MATLAB-Toolboxes/tree/master/RQAToolbox) developed by Bruce Kay and Mike Richardson, with contributions from countless collaborators. 
