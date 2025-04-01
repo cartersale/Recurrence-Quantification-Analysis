@@ -108,7 +108,7 @@ crossRQA(data1, data2, params)
 
 For guidance on using RQA to explore human behaviour in social and behavioural research: 
 
-- Chapter: Macpherson, C., Richardson, M., & Kallen, R. W. (2024). Advanced quantitative approaches: Linear and non-linear time-series analyses. In Cambridge handbook of research methods and statistics for the social and behavioral sciences (Vol. 3). Cambridge University Press (CUP).
+- Chapter: Macpherson, C., Richardson, M., & Kallen, R. W. (2024). Advanced quantitative approaches: Linear and non-linear time-series analyses. In *Cambridge handbook of research methods and statistics for the social and behavioral sciences* (Vol. 3). Cambridge University Press (CUP).
 
 - Python tutorial: [Linear and Nonlinear Time Series Analysis](https://github.com/xkiwilabs/Linear-NonLinear-TSAnalysis)
 
