@@ -2,6 +2,12 @@
 
 This package provides fast and flexible tools for performing Auto Recurrence Quantification Analysis (autoRQA) and Cross Recurrence Quantification Analysis (crossRQA) on time series data. It supports phase space reconstruction, recurrence plot generation, and computation of standard RQA metrics, including %REC, %DET, MaxLine, MeanLine, Entropy, and more.
 
+## Set Up Instructions
+This repository includes C++ extensions that need to be compiled before use. To compile the code, ensure you have a C++ compiler installed. Then run the following from the root directory:
+```python
+pip install .
+```
+
 ## Parameters
 
 The following parameters are used for both **Auto Recurrence Quantification Analysis (`autoRQA`)** and **Cross Recurrence Quantification Analysis (`crossRQA`)**.
@@ -97,12 +103,6 @@ crossRQA(data1, data2, params)
 ```
 
 ---
-
-## Set Up Instructions
-This repository includes C++ extensions that need to be compiled before use. To compile the code, ensure you have a C++ compiler installed. Then run the following from the root directory:
-```python
-pip install .
-```
 
 ## Related Resources
 
