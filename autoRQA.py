@@ -10,8 +10,10 @@ def autoRQA(data, params):
     ds = rqa_utils_cpp.rqa_dist(dataX, dataX, dim=params['eDim'], lag=params['tLag'])
 
     # Similarly, you can call xRQA_stats:
-    td, rs, mats, err_code = rqa_utils_cpp.rqa_stats(ds["d"], rescale=params['rescaleNorm'], rad=params['radius'], diag_ignore=params['tw'], minl=params['minl'], rqa_mode="auto")
-
+    td, rs, mats, err_code = rqa_utils_cpp.rqa_stats(
+        ds["d"], rescale=params['rescaleNorm'], rad=params['radius'], 
+        diag_ignore=params['tw'], minl=params['minl'], rqa_mode="auto"
+        )
 
     ## Print stats
     if err_code == 0:

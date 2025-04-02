@@ -16,10 +16,10 @@ def crossRQA(data1, data2, params):
     dataX1 = norm_utils.normalize_data(data1, params['norm'])
     dataX2 = norm_utils.normalize_data(data2, params['norm'])
 
-    # Perform RQA computations
+    # Compute distance maxtrix for RQA
     ds = rqa_utils_cpp.rqa_dist(dataX1, dataX2, dim=params['eDim'], lag=params['tLag'])
 
-    # Similarly, you can call xRQA_stats:
+    # Perform CRQA calculations
     td, rs, mats, err_code = rqa_utils_cpp.rqa_stats(ds["d"], rescale=params['rescaleNorm'], rad=params['radius'], diag_ignore=0, minl=params['minl'], rqa_mode="cross")
 
     # Print stats
