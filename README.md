@@ -35,6 +35,9 @@ The following parameters are used for both **Auto Recurrence Quantification Anal
 |                 |              |             | - `'rp'`: Basic recurrence or cross-recurrence plot only.                              |
 |                 |              |             | - `'rp-timeseries'`: Plot the recurrence plot with the time series underneath or alongside. |
 | **`pointSize`** | `int`     | `4`      | Size of the points in the recurrence or cross-recurrence plot.                                           |
+| **`saveFig`** | `bool`     | `True`      | Whether to save the recurrence or cross-recurrence plot:                                             |
+|                 |              |             | - `True`: Save plot.                                                |
+|                 |              |             | - `False`: Do not save plot.                                                   |
 | **`showMetrics`** | `bool`     | `True`      | Whether to show RQA statistics in the console:                                             |
 |                 |              |             | - `True`: Show metrics in the console.                                                |
 |                 |              |             | - `False`: Do not show metrics in the console.                                                   |
@@ -66,6 +69,7 @@ params = {
     'minl': 2,                          # Minimum line length
     'plotMode': 'rp-timeseries',        # Recurrence plot with time series
     'pointSize': 2,                     # Size of points in the plot
+    'saveFig': False,                   # Save figure
     'showMetrics': True,                # Show metrics in the console
     'doStatsFile': True                 # Write statistics to file
 }
@@ -94,6 +98,7 @@ params = {
     'minl': 2,                          # Minimum line length
     'plotMode': 'rp-timeseries',        # Recurrence plot with time series
     'pointSize': 2,                     # Size of points in the plot
+    'saveFig': False,                   # Save figure
     'showMetrics': True,                # Show metrics in the console
     'doStatsFile': True                 # Write statistics to file
 }

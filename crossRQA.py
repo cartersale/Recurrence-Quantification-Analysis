@@ -1,5 +1,6 @@
 from utils import norm_utils, plot_utils, output_io_utils
 from utils import rqa_utils_cpp
+import os
 
 def crossRQA(data1, data2, params):
     """
@@ -36,14 +37,18 @@ def crossRQA(data1, data2, params):
     # Plot results
     # plotMode: 'none', 'rp', 'rp_timeseries',
     if 'rp' in params['plotMode']:
+        save_path = None
+        if params.get('saveFig', False):
+            save_path = os.path.join('images', 'rqa', f"crossRQA_plot.png")
+
         plot_utils.plot_rqa_results(
             dataX=dataX1,
             dataY=dataX2,
             td=td,
             plot_mode=params['plotMode'],
             point_size=params['pointSize'],
+            save_path=save_path  
         )
-
     # Write stats
     if params['doStatsFile']:
         output_io_utils.write_rqa_stats("CrossRQA", params, rs, err_code)

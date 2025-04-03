@@ -1,5 +1,6 @@
 from utils import norm_utils, plot_utils, output_io_utils
 from utils import rqa_utils_cpp
+import os
 
 def autoRQA(data, params):
     """ Auto Recurrence Quantification Analysis """
@@ -29,12 +30,18 @@ def autoRQA(data, params):
     # Plot results
     # plotMode: 'none', 'rp', 'rp_timeseries',
     plot_mode = params.get('plotMode', 'rp')
-    if plot_mode == 'rp' or plot_mode == 'rp-timeseries':
+    if plot_mode in ('rp', 'rp-timeseries'):
+        save_path = None
+        if params.get('saveFig', False):
+            save_path = os.path.join('images', 'rqa', f"autoRQA_plot.png")
+        
+
         plot_utils.plot_rqa_results(
             dataX=dataX,
             td=td,
             plot_mode=plot_mode,
             point_size=params['pointSize'],
+            save_path=save_path 
         )
 
     # Write stats

@@ -4,8 +4,8 @@ import numpy as np
 
 def plot_rqa_results(
     dataX=None, dataY=None, td=None,
-    plot_mode='rp', point_size=4
-):
+    plot_mode='rp', point_size=4,
+    save_path=None):
     """
     Plot RQA or CRQA results with aligned RP and TS width.
     """
@@ -56,6 +56,11 @@ def plot_rqa_results(
     else:
         fig.align_xlabels([ax_rp])
         fig.align_ylabels([ax_rp])
-
+    
+    if save_path:
+       import os
+       os.makedirs(os.path.dirname(save_path), exist_ok=True)
+       plt.savefig(save_path, dpi=300, bbox_inches='tight')
+       print(f"Plot saved to: {save_path}")
 
     plt.show()
