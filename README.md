@@ -1,4 +1,4 @@
-# Recurrence Quantification Analysis (RQA) Package
+# Recurrence Quantification Analysis (RQA) Python & C++ Package
 
 This package provides fast and flexible tools for performing Auto Recurrence Quantification Analysis (autoRQA) and Cross Recurrence Quantification Analysis (crossRQA) on time series data. It supports phase space reconstruction, recurrence plot generation, and computation of standard RQA metrics, including %REC, %DET, MaxLine, MeanLine, Entropy, and more.
 
