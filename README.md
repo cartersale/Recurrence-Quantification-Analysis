@@ -195,6 +195,8 @@ Run the `analysisExamples.ipynb` notebook to see all three RQA methods in action
 
 For guidance on using RQA to explore human behaviour in social and behavioural research: 
 
+- Chapter: Richardson, M. J., Dale, R., & Marsh, K. L. (2014). Complex dynamical systems in social and personality psychology. *Handbook of research methods in social and personality psychology*, 253(10.1017).
+
 - Chapter: Macpherson, C., Richardson, M., & Kallen, R. W. (2024). Advanced quantitative approaches: Linear and non-linear time-series analyses. In *Cambridge handbook of research methods and statistics for the social and behavioral sciences* (Vol. 3). Cambridge University Press (CUP).
 
 - Python tutorial: [Linear and Nonlinear Time Series Analysis](https://github.com/xkiwilabs/Linear-NonLinear-TSAnalysis)
