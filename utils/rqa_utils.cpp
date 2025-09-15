@@ -29,6 +29,10 @@ py::dict rqa_dist(py::array_t<float> a, py::array_t<float> b, int dim, int lag) 
     int n2 = n - lag * (dim - 1);
     if (n2 <= 0)
         throw std::runtime_error("Not enough data for these embedding parameters.");
+    if (n2 < 10) {
+        throw std::runtime_error("Time series too short for reliable RQA analysis. Need at least " + 
+                                std::to_string(lag * (dim - 1) + 10) + " data points.");
+    }
 
     float* ptr_a = static_cast<float*>(buf_a.ptr);
     float* ptr_b = static_cast<float*>(buf_b.ptr);
@@ -144,8 +148,8 @@ py::tuple rqa_line(py::array_t<int8_t> thrd, int diag_ignore) {
         throw std::runtime_error("Thresholded distance matrix must be square");
 
     int n = buf.shape[0];
-    int possnumll = (n * n) / 2;
-    std::vector<short> ll(possnumll, 0);
+    std::vector<short> ll;
+    ll.reserve(n * n);
     int diagCount = 2 * n - 1;
     std::vector<std::vector<float>> recur(diagCount, std::vector<float>(2, 0.0f));
     int nlines = 0;
@@ -167,10 +171,8 @@ py::tuple rqa_line(py::array_t<int8_t> thrd, int diag_ignore) {
             }
             int index = row * n + col;
             if (data[index] == 1) {
-                nlines++;
-                if(nlines > possnumll)
-                    nlines = possnumll;
-                ll[nlines - 1] = 1;
+                ll.push_back(1);
+                nlines = ll.size();
                 recur[i][1] += 1;
                 int k = j + 1;
                 while (k < ld) {
@@ -184,7 +186,7 @@ py::tuple rqa_line(py::array_t<int8_t> thrd, int diag_ignore) {
                     }
                     int idx = r * n + c;
                     if (data[idx] == 1) {
-                        ll[nlines - 1] += 1;
+                        ll.back() += 1;
                         recur[i][1] += 1;
                         k++;
                     } else {
@@ -197,7 +199,7 @@ py::tuple rqa_line(py::array_t<int8_t> thrd, int diag_ignore) {
             }
         }
     }
-    ll.resize(nlines);
+    // ll already has correct size from dynamic allocation
 
     int mid = 0;
     float max_val = recur[0][0];
@@ -301,8 +303,8 @@ py::tuple rqa_histlines(py::array_t<short> llengths, int minl) {
         auto linehist = py::array_t<float>({1, 2});
         auto buf_hist = linehist.request();
         float* hist_ptr = static_cast<float*>(buf_hist.ptr);
-        hist_ptr[0] = 0;
-        hist_ptr[1] = 0;
+        hist_ptr[0] = 0.0f;
+        hist_ptr[1] = 0.0f;
         py::list linestats;
         linestats.append(0.0);
         linestats.append(0.0);
@@ -469,9 +471,40 @@ py::tuple rqa_stats(py::array_t<float> d, int rescale, float rad, int diag_ignor
     double trend2 = line_result[4].cast<double>();
 
     if (ll.request().size == 0) {
-        throw std::runtime_error("Error in line counting.");
         err_code = 2;
-        return py::make_tuple(py::none(), py::none(), py::none(), err_code);
+        py::dict empty_rs;
+        empty_rs["rescale"] = rescale;
+        empty_rs["rad"] = rad;
+        empty_rs["diag_ignore"] = diag_ignore;
+        empty_rs["minl"] = minl;
+        empty_rs["perc_recur"] = 0.0;
+        empty_rs["perc_determ"] = 0.0;
+        empty_rs["npts"] = npts;
+        empty_rs["entropy"] = 0.0;
+        empty_rs["complexity"] = 0.0;
+        empty_rs["maxl_poss"] = maxl_poss;
+        empty_rs["maxl_found"] = 0.0;
+        empty_rs["trend_lower_diag"] = 0.0;
+        empty_rs["trend_upper_diag"] = 0.0;
+        empty_rs["mean_line_length"] = 0.0;
+        empty_rs["std_line_length"] = 0.0;
+        empty_rs["count_line"] = 0;
+        empty_rs["laminarity"] = 0.0;
+        empty_rs["trapping_time"] = 0.0;
+        empty_rs["vmax"] = 0;
+        empty_rs["divergence"] = 0.0;
+        
+        py::dict empty_mats;
+        empty_mats["rescale"] = rescale;
+        empty_mats["rad"] = rad;
+        empty_mats["diag_ignore"] = diag_ignore;
+        empty_mats["minl"] = minl;
+        empty_mats["td"] = td;
+        empty_mats["ll"] = py::array_t<short>(0);
+        empty_mats["lh"] = py::array_t<float>({1, 2});
+        empty_mats["vertical"] = py::array_t<int>(0);
+        
+        return py::make_tuple(td, empty_rs, empty_mats, err_code);
     }
     py::tuple hist_result = rqa_histlines(ll, minl);
     py::array lh = hist_result[0].cast<py::array>();
@@ -567,6 +600,57 @@ py::tuple rqa_stats(py::array_t<float> d, int rescale, float rad, int diag_ignor
 }
 
 /************************************
+ * rqa_dist_multivariate
+ *
+ * Compute distances for multivariate time series where each column
+ * represents a different dimension (no time-delay embedding needed).
+ ************************************/
+py::dict rqa_dist_multivariate(py::array_t<float> data_a, py::array_t<float> data_b) {
+    auto buf_a = data_a.request();
+    auto buf_b = data_b.request();
+    
+    if (buf_a.ndim != 2 || buf_b.ndim != 2)
+        throw std::runtime_error("Multivariate data must be 2D arrays (time x dimensions).");
+    
+    int n_a = buf_a.shape[0];  // number of time points
+    int dim_a = buf_a.shape[1]; // number of dimensions
+    int n_b = buf_b.shape[0];
+    int dim_b = buf_b.shape[1];
+    
+    if (dim_a != dim_b)
+        throw std::runtime_error("Both datasets must have the same number of dimensions.");
+    
+    if (n_a < 10 || n_b < 10)
+        throw std::runtime_error("Multivariate time series too short for reliable RQA analysis. Need at least 10 data points.");
+    
+    float* ptr_a = static_cast<float*>(buf_a.ptr);
+    float* ptr_b = static_cast<float*>(buf_b.ptr);
+    
+    auto result = py::array_t<float>({n_a, n_b});
+    auto buf_res = result.request();
+    float* res_ptr = static_cast<float*>(buf_res.ptr);
+    
+    // Compute Euclidean distances between multivariate points
+    for (int i = 0; i < n_a; i++) {
+        for (int j = 0; j < n_b; j++) {
+            float sum_sq = 0.0f;
+            for (int d = 0; d < dim_a; d++) {
+                float diff = ptr_a[i * dim_a + d] - ptr_b[j * dim_a + d];
+                sum_sq += diff * diff;
+            }
+            res_ptr[i * n_b + j] = std::sqrt(sum_sq);
+        }
+    }
+    
+    py::dict ds;
+    ds["dim"] = dim_a;
+    ds["lag"] = 0;  // No lag for multivariate
+    ds["d"] = result;
+    ds["multivariate"] = true;
+    return ds;
+}
+
+/************************************
  * Module definition
  ************************************/
 PYBIND11_MODULE(rqa_utils_cpp, m) {
@@ -600,4 +684,8 @@ PYBIND11_MODULE(rqa_utils_cpp, m) {
           "Perform full RQA analysis on a distance matrix, including vertical metrics and divergence",
           py::arg("d"), py::arg("rescale"), py::arg("rad"),
           py::arg("diag_ignore"), py::arg("minl"), py::arg("rqa_mode") = "auto");
+
+    m.def("rqa_dist_multivariate", &rqa_dist_multivariate,
+          "Compute distances for multivariate time series (no embedding needed)",
+          py::arg("data_a"), py::arg("data_b"));
 }
