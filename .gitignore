@@ -31,3 +31,4 @@ utils/rqa_utils_cpp.cpython-312-darwin.so
 __pycache__/multivariateRQA.cpython-311.pyc
 .vscode/settings.json
 rqa_analysis.egg*
+multivariateR.ipynb

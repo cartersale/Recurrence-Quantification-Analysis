@@ -635,7 +635,9 @@ py::dict rqa_dist_multivariate(py::array_t<float> data_a, py::array_t<float> dat
         for (int j = 0; j < n_b; j++) {
             float sum_sq = 0.0f;
             for (int d = 0; d < dim_a; d++) {
-                float diff = ptr_a[i * dim_a + d] - ptr_b[j * dim_a + d];
+                float val_a = *((float*)((char*)buf_a.ptr + i*buf_a.strides[0] + d*buf_a.strides[1]));
+                float val_b = *((float*)((char*)buf_b.ptr + j*buf_b.strides[0] + d*buf_b.strides[1]));
+                float diff = val_a - val_b;
                 sum_sq += diff * diff;
             }
             res_ptr[i * n_b + j] = std::sqrt(sum_sq);

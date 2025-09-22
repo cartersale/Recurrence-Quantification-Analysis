@@ -32,11 +32,20 @@ def normalize_data(data, norm="none"):
         norm = mapping.get(norm, f"INVALID_INT_{norm}")
 
     if norm == "minmax":
-        return (data - np.min(data)) / (np.max(data) - np.min(data))
+        if data.ndim == 1:
+            return (data - np.min(data)) / (np.max(data) - np.min(data))
+        else:
+            return (data - np.min(data, axis=0)) / (np.max(data, axis=0) - np.min(data, axis=0))
     elif norm == "zscore":
-        return (data - np.mean(data)) / np.std(data)
+        if data.ndim == 1:
+            return (data - np.mean(data)) / np.std(data)
+        else:
+            return (data - np.mean(data, axis=0)) / np.std(data, axis=0)
     elif norm == "center":
-        return data - np.mean(data)
+        if data.ndim == 1:
+            return data - np.mean(data)
+        else:
+            return data - np.mean(data, axis=0)
     elif norm == "none":
         return data
     else:
