@@ -32,3 +32,4 @@ __pycache__/multivariateRQA.cpython-311.pyc
 .vscode/settings.json
 rqa_analysis.egg*
 multivariateR.ipynb
+__pycache__

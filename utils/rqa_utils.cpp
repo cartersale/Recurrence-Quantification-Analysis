@@ -10,6 +10,7 @@
 #include <numeric>
 #include <map>
 #include <string>
+#include <cstdint>
 
 namespace py = pybind11;
 
@@ -653,6 +654,39 @@ py::dict rqa_dist_multivariate(py::array_t<float> data_a, py::array_t<float> dat
 }
 
 /************************************
+ * rqa_drp
+ *
+ * Compute the Diagonal Recurrence Profile (DRP) of a thresholded
+* recurrence matrix.
+ ************************************/
+py::array_t<double> rqa_drp(py::array_t<int8_t> thrd) {
+    auto buf = thrd.request();
+    if (buf.ndim != 2 || buf.shape[0] != buf.shape[1])
+        throw std::runtime_error("Thresholded matrix must be square");
+
+    int n = buf.shape[0];
+    int diagCount = 2 * n - 1;
+    int8_t* data = static_cast<int8_t*>(buf.ptr);
+
+    auto drp = py::array_t<double>({diagCount});
+    auto buf_drp = drp.request();
+    double* drp_ptr = static_cast<double*>(buf_drp.ptr);
+
+    for (int d = -(n - 1); d <= (n - 1); d++) {
+        int len = n - std::abs(d);
+        int count = 0;
+        for (int j = 0; j < len; j++) {
+            int row = (d >= 0) ? j : j - d;
+            int col = (d >= 0) ? j + d : j;
+            if (data[row * n + col] == 1) count++;
+        }
+        drp_ptr[d + n - 1] = (len > 0) ? static_cast<double>(count) / len : 0.0;
+    }
+
+    return drp;
+}
+
+/************************************
  * Module definition
  ************************************/
 PYBIND11_MODULE(rqa_utils_cpp, m) {
@@ -690,4 +724,8 @@ PYBIND11_MODULE(rqa_utils_cpp, m) {
     m.def("rqa_dist_multivariate", &rqa_dist_multivariate,
           "Compute distances for multivariate time series (no embedding needed)",
           py::arg("data_a"), py::arg("data_b"));
+
+    m.def("rqa_drp", &rqa_drp,
+          "Compute the Diagonal Recurrence Profile (DRP) of a thresholded recurrence matrix",
+          py::arg("thrd"));
 }
