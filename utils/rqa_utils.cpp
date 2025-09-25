@@ -680,7 +680,7 @@ py::array_t<double> rqa_drp(py::array_t<int8_t> thrd) {
             int col = (d >= 0) ? j + d : j;
             if (data[row * n + col] == 1) count++;
         }
-        drp_ptr[d + n - 1] = (len > 0) ? static_cast<double>(count) / len : 0.0;
+        drp_ptr[d + n - 1] = (len > 0) ? 100.0 * count / len : 0.0;
     }
 
     return drp;

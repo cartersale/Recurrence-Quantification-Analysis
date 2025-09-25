@@ -1,14 +1,15 @@
 # Recurrence Quantification Analysis (RQA) Python & C++ Package
 
-This package provides fast and flexible tools for performing **Auto Recurrence Quantification Analysis (autoRQA)**, **Cross Recurrence Quantification Analysis (crossRQA)**, and **Multivariate Recurrence Quantification Analysis (multivariateRQA)** on time series data. It supports phase space reconstruction, recurrence plot generation, and computation of standard RQA metrics, including %REC, %DET, MaxLine, MeanLine, Entropy, Laminarity, Trapping Time, and more.
+This package provides fast and flexible tools for performing **Auto Recurrence Quantification Analysis (autoRQA)**, **Cross Recurrence Quantification Analysis (crossRQA)**, **Multivariate Recurrence Quantification Analysis (multivariateRQA)**, and **Diagonal Recurrence Profile (DRP)** on time series data. It supports phase space reconstruction, recurrence plot generation, and computation of standard RQA metrics, including %REC, %DET, MaxLine, MeanLine, Entropy, Laminarity, Trapping Time, and more.
 
 ## Key Features
 
 - **🚀 High-performance C++ core** with Python interface for speed
-- **📊 Three analysis modes**:
+- **📊 Four analysis modes**:
   - **Traditional RQA**: Single time series with time-delay embedding
   - **Cross-RQA**: Compare two time series or systems  
   - **Multivariate RQA**: Direct analysis of multi-dimensional systems (NEW!)
+  - **Diagonal Recurrence Profile**: Compute recurrence across a range of time lags (NEW!)
 - **📈 Comprehensive metrics**: All standard RQA measures plus vertical line statistics
 - **🎨 Visualization tools**: Recurrence plots with optional time series overlay
 - **📁 Example datasets**: Real physiological data, chaotic systems, and synthetic data
@@ -22,7 +23,7 @@ pip install .
 
 ## Parameters
 
-The following parameters are used for **Auto RQA (`autoRQA`)**, **Cross RQA (`crossRQA`)**, and **Multivariate RQA (`multivariateRQA`)**. Note that multivariate RQA does not require embedding parameters (`eDim`, `tLag`) as it uses the actual system dimensions directly.
+The following parameters are used for **Auto RQA (`autoRQA`)**, **Cross RQA (`crossRQA`)**, **Multivariate RQA (`multivariateRQA`)** and computing **Diagonal Recurrence Profiles (`DRP`)**. Note that multivariate RQA does not require embedding parameters (`eDim`, `tLag`) as it uses the actual system dimensions directly.
 
 ### Parameter List
 
