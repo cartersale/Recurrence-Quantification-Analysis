@@ -20,21 +20,25 @@ def DRP(data, params, mode="auto"):
             'tLag'         : embedding lag
             'rescaleNorm'  : rescale mode (0=none, 1=mean, 2=max)
             'radius'       : recurrence threshold
+            'tw'           : Theiler window (ignored diagonals for auto mode)
+            'maxLag'       : maximum lag to return (optional)
             'plotMode'     : 'none' or 'drp'
             'saveFig'      : whether to save figure
             'pointSize'    : marker size for plot
-            'doStatsFile'  : whether to write stats file
-            'showMetrics'  : whether to print summary metrics
+            'doStatsFile'  : whether to write profile to file
     mode : str
         "auto" (default) or "cross".
 
     Returns
     -------
     drp : np.ndarray
-        Diagonal recurrence profile.
+        Diagonal recurrence profile (possibly truncated).
     lags : np.ndarray
         Array of lag values corresponding to drp.
     """
+    from utils import norm_utils, plot_utils, output_io_utils
+    import numpy as np, os
+
     if mode == "cross":
         if not isinstance(data, (list, tuple)) or len(data) != 2:
             raise ValueError("Cross DRP requires a list/tuple of two time series.")
@@ -42,7 +46,7 @@ def DRP(data, params, mode="auto"):
         dataY = norm_utils.normalize_data(data[1], params['norm'])
     else:
         dataX = norm_utils.normalize_data(data, params['norm'])
-        dataY = dataX  # auto mode compares series to itself
+        dataY = dataX
 
     # Distance & recurrence
     ds = rqa_utils_cpp.rqa_dist(dataX, dataY, dim=params['eDim'], lag=params['tLag'])
@@ -53,11 +57,12 @@ def DRP(data, params, mode="auto"):
     drp = rqa_utils_cpp.rqa_drp(td)
     lags = np.arange(-(td.shape[0] - 1), td.shape[0])
 
-    # Print summary
-    if params.get('showMetrics', True):
-        peak_lag = int(lags[int(drp.argmax())])
-        peak_val = float(drp.max())
-        print(f"{mode.capitalize()} DRP peak at lag {peak_lag} with recurrence {peak_val:.3f}")
+    # Truncate if maxLag is set
+    maxLag = params.get('maxLag', None)
+    if maxLag is not None:
+        mask = np.abs(lags) <= maxLag
+        lags = lags[mask]
+        drp = drp[mask]
 
     # Plot
     if params.get('plotMode', 'drp') == 'drp':
@@ -70,14 +75,11 @@ def DRP(data, params, mode="auto"):
             lags=lags, drp=drp, point_size=params.get('pointSize', 2), save_path=save_path
         )
 
-    # Stats file
+    # Write full profile
     if params.get('doStatsFile', False):
-        stats = {"peak_lag": int(lags[int(drp.argmax())]),
-                 "peak_val": float(drp.max())}
-        output_io_utils.write_rqa_stats(f"DRP-{mode}", params, stats, err_code=0)
+        output_io_utils.write_drp_profile(f"DRP-{mode}", params, lags, drp)
 
     return drp, lags
-
 
 def crossDRP(data1, data2, params):
     """

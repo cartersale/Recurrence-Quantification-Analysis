@@ -91,7 +91,7 @@ def plot_drp_results(
     ax.axvline(0, color='k', linestyle='--', alpha=0.6, label="Lag=0")
     ax.set_title("Diagonal Recurrence Profile (DRP)")
     ax.set_xlabel("Lag")
-    ax.set_ylabel("Recurrence Rate")
+    ax.set_ylabel("% Recurrence")
     ax.grid(True, linestyle="--", alpha=0.5)
     ax.legend(loc="best")
 

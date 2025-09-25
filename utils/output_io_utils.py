@@ -24,3 +24,40 @@ def write_rqa_stats(filename, params, rs, err_code):
             )
         else:
             f.write("0.0, 0.0, 0.0, 0.0, 0.0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0\n")
+
+def write_drp_profile(filename, params, lags, drp):
+    """
+    Save full DRP profile (lags + recurrence values) to CSV,
+    with metadata written into each row (like write_rqa_stats).
+
+    Parameters
+    ----------
+    filename : str
+        Base name for the file.
+    params : dict
+        DRP parameters (saved into each row).
+    lags : np.ndarray
+        Lag values.
+    drp : np.ndarray
+        DRP values.
+    """
+    import os
+
+    stats_file = "DRP_Profile.csv"
+    file_exists = os.path.exists(stats_file)
+
+    # Write header if file doesn't exist
+    if not file_exists:
+        with open(stats_file, "w") as f:
+            f.write("filename,eDim,tLag,rescale,radius,lag,drp\n")
+
+    # Append results row-by-row
+    with open(stats_file, "a") as f:
+        for lag, val in zip(lags, drp):
+            f.write(
+                f"{filename}, {params['eDim']}, {params['tLag']}, "
+                f"{params['rescaleNorm']}, {params['radius'] * 100}, "
+                f"{lag}, {val:.6f}\n"
+            )
+
+    print(f"DRP profile written to {stats_file}")
