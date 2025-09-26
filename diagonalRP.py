@@ -25,6 +25,7 @@ def DRP(data, params, mode="auto"):
             'plotMode'     : 'none' or 'drp'
             'saveFig'      : whether to save figure
             'pointSize'    : marker size for plot
+            'showMetrics'  : whether to print DRP metrics to console
             'doStatsFile'  : whether to write profile to file
     mode : str
         "auto" (default) or "cross".
@@ -36,9 +37,6 @@ def DRP(data, params, mode="auto"):
     lags : np.ndarray
         Array of lag values corresponding to drp.
     """
-    from utils import norm_utils, plot_utils, output_io_utils
-    import numpy as np, os
-
     if mode == "cross":
         if not isinstance(data, (list, tuple)) or len(data) != 2:
             raise ValueError("Cross DRP requires a list/tuple of two time series.")
@@ -63,6 +61,16 @@ def DRP(data, params, mode="auto"):
         mask = np.abs(lags) <= maxLag
         lags = lags[mask]
         drp = drp[mask]
+
+    # Show metrics
+    if params.get('showMetrics', False) and len(drp) > 0:
+        max_idx = np.argmax(drp)
+        max_val = drp[max_idx]
+        max_lag = lags[max_idx]
+        mean_val = np.mean(drp)
+
+        print(f"[DRP Metrics] Mean recurrence rate = {mean_val:.4f}")
+        print(f"[DRP Metrics] Max recurrence rate  = {max_val:.4f} at lag = {max_lag}")
 
     # Plot
     if params.get('plotMode', 'drp') == 'drp':

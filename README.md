@@ -1,6 +1,6 @@
 # Recurrence Quantification Analysis (RQA) Python & C++ Package
 
-This package provides fast and flexible tools for performing **Auto Recurrence Quantification Analysis (autoRQA)**, **Cross Recurrence Quantification Analysis (crossRQA)**, **Multivariate Recurrence Quantification Analysis (multivariateRQA)**, and **Diagonal Recurrence Profile (DRP)** on time series data. It supports phase space reconstruction, recurrence plot generation, and computation of standard RQA metrics, including %REC, %DET, MaxLine, MeanLine, Entropy, Laminarity, Trapping Time, and more.
+This package provides fast and flexible tools for performing **Auto Recurrence Quantification Analysis (autoRQA)**, **Cross Recurrence Quantification Analysis (crossRQA)**, **Multivariate Recurrence Quantification Analysis (multivariateRQA)**, and **Diagonal Recurrence Profiles (DRP)** on time series data. It supports phase space reconstruction, recurrence plot generation, and computation of standard RQA metrics, including %REC, %DET, MaxLine, MeanLine, Entropy, Laminarity, Trapping Time, and more.
 
 ## Key Features
 
@@ -160,6 +160,43 @@ td, rs, mats, err_code = multivariateCrossRQA(data1, data2, params)
 - **Ideal for**: Coupled oscillators, multi-channel physiological signals, climate data
 - **Direct analysis** of known multi-dimensional systems
 
+### Diagonal Recurrence Profile (`DRP`) - NEW!
+
+```python
+import pandas as pd
+from diagonalRP import DRP, crossDRP
+
+# Load example data or generate sample data
+data = pd.read_csv('exampleData/PostureData.csv', header=None).iloc[:, 0].values
+
+# Set parameters
+params = {
+    'norm': 1,                          # Normalize to unit interval
+    'eDim': 3,                          # Embedding dimension
+    'tLag': 15,                         # Time lag
+    'rescaleNorm': 1,                   # Rescale using mean distance
+    'radius': 0.1,                      # Recurrence radius
+    'tw': 1,                            # Theiler window for auto-RQA
+    'maxLag': 2000,                     # Maximum lag for DRP (auto = full time  series)
+    'plotMode': 'drp',                  # Plot DRP
+    'pointSize': 2,                     # Size of points in the plot
+    'saveFig': False,                   # Save figure
+    'showMetrics': True,                # Show metrics in the console
+    'doStatsFile': False                # Write statistics to file
+}
+
+# Run Auto DRP
+drp, lags = DRP(data, params)
+
+# Or run Cross DRP between two time series
+data = pd.read_csv('exampleData/RockingChairData.csv', header=None)
+data1 = data.iloc[:, 0].values  # First time series
+data2 = data.iloc[:, 1].values  # Second time series
+
+drp, lags = crossDRP(data1, data2, params)
+
+```
+
 ---
 
 ## Example Datasets
@@ -184,11 +221,12 @@ See `exampleData/README.md` for detailed descriptions and usage examples for eac
 
 ## Quick Start with Jupyter Notebook
 
-Run the `analysisExamples.ipynb` notebook to see all three RQA methods in action with real data examples, including:
+Run the `analysisExamples.ipynb` notebook to see all RQA methods in action with real data examples, including:
 - Traditional RQA on postural sway data
 - Cross-RQA on interpersonal coordination
 - Categorical RQA on discrete states
 - **Multivariate RQA on 3D chaotic systems** (demonstrates the new functionality)
+- Auto and Cross Diagonal Recurrence Profiles
 
 ---
 
@@ -205,3 +243,5 @@ For guidance on using RQA to explore human behaviour in social and behavioural r
 ## References
 
 This code is based on a [matlab toolbox](https://github.com/xkiwilabs/MATLAB-Toolboxes/tree/master/RQAToolbox) developed by Bruce Kay and Mike Richardson, with contributions from countless collaborators. 
+
+The implementation of **multivariate RQA** and **Diagonal Recurrence Profiles** were validated against the [`crqa` R package](https://cran.r-project.org/web/packages/crqa/index.html) developed by Coco, Mønster, Leonardi, Dale, Wallot, Dixon, Nash and Paxton.  

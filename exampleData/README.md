@@ -1,6 +1,6 @@
 # Example Data for RQA Analysis
 
-This directory contains example datasets for testing Recurrence Quantification Analysis (RQA) methods, including traditional univariate RQA, cross-RQA, and multivariate RQA.
+This directory contains example datasets for testing Recurrence Quantification Analysis (RQA) methods, including traditional univariate RQA, cross-RQA, multivariate RQA, and diagonal recurrence profiles (DRP).
 
 ## Time Series Files:
 
@@ -9,13 +9,13 @@ This directory contains example datasets for testing Recurrence Quantification A
 1. **PostureData.csv** - Human postural sway data (1800 points)
    - 2 columns: Center of pressure coordinates (x, y) in millimeters
    - Recorded during quiet standing balance task
-   - Suitable for: Traditional RQA, Cross-RQA, Multivariate RQA
+   - Suitable for: Traditional RQA, Cross-RQA, Multivariate RQA, DRP
    - Example use: Balance control analysis, postural stability assessment
 
 2. **RockingChairData.csv** - Synchronized rocking chair movements (3598 points)
    - 2 columns: Position data from two synchronized rocking chairs
    - Demonstrates interpersonal coordination dynamics
-   - Suitable for: Cross-RQA analysis of coordination patterns
+   - Suitable for: Cross-RQA analysis of coordination patterns including cross-DRP
    - Example use: Social motor coordination, synchronization analysis
 
 ### Categorical/Discrete Data:
@@ -181,6 +181,39 @@ lorenz2 = pd.read_csv('exampleData/lorenz_chaotic_xyz_2.csv')[['x', 'y', 'z']].v
 td, rs, mats, err_code = multivariateXRQA(lorenz1, lorenz2, multivar_params)
 ```
 
+### Diagonal Recurrence Profiles:
+```python
+import pandas as pd
+from diagonalRP import DRP, crossDRP
+
+# Example 1: Auto DRP (assessing % recurrence across various lags)
+data = pd.read_csv('exampleData/PostureData.csv', header=None).iloc[:, 0].values
+
+params = {
+    'norm': 1,                          # Normalize to unit interval
+    'eDim': 3,                          # Embedding dimension
+    'tLag': 15,                         # Time lag
+    'rescaleNorm': 1,                   # Rescale using mean distance
+    'radius': 0.1,                      # Recurrence radius
+    'tw': 1,                            # Theiler window for auto-RQA
+    'maxLag': 2000,                     # Maximum lag for DRP (auto = full time  series)
+    'plotMode': 'drp',                  # Plot DRP
+    'pointSize': 2,                     # Size of points in the plot
+    'saveFig': False,                   # Save figure
+    'showMetrics': True,                # Show metrics in the console
+    'doStatsFile': False                # Write statistics to file
+}
+
+drp, lags = DRP(data, params)
+
+# Example 2: Cross DRP (good for assessing leader-follower behaviours)
+data = pd.read_csv('exampleData/RockingChairData.csv', header=None)
+data1 = data.iloc[:, 0].values  # First time series
+data2 = data.iloc[:, 1].values  # Second time series
+
+drp, lags = crossDRP(data1, data2, params)
+```
+
 ## Data Selection Guidelines:
 
 - **Physiological data** (PostureData, RockingChairData): Use moderate radius (0.05-0.15), embedding dimension 3-5
@@ -194,5 +227,6 @@ td, rs, mats, err_code = multivariateXRQA(lorenz1, lorenz2, multivar_params)
 1. **Start with multivariate RQA** when you have multiple related variables
 2. **Use cross-RQA** to study coordination between two systems/signals  
 3. **Traditional RQA** when you have a single variable or need time-delay embedding
+4. **Use diagonal recurrence profiles** to assess lead/lag or leader/follower dynamics
 4. **Parameter tuning**: Start with suggested values, then optimize based on your data characteristics
 5. **Visual inspection**: Always examine recurrence plots to understand the underlying dynamics
