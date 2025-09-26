@@ -23,7 +23,7 @@ pip install .
 
 ## Parameters
 
-The following parameters are used for **Auto RQA (`autoRQA`)**, **Cross RQA (`crossRQA`)**, **Multivariate RQA (`multivariateRQA`)** and computing **Diagonal Recurrence Profiles (`DRP`)**. Note that multivariate RQA does not require embedding parameters (`eDim`, `tLag`) as it uses the actual system dimensions directly.
+The following parameters are used for running **Auto RQA (`autoRQA`)**, **Cross RQA (`crossRQA`)**, **Multivariate RQA (`multivariateRQA`)** and computing **Diagonal Recurrence Profiles (`DRP`)**. Note that multivariate RQA does not require embedding parameters (`eDim`, `tLag`) as it uses the actual system dimensions directly.
 
 ### Parameter List
 
@@ -47,6 +47,7 @@ The following parameters are used for **Auto RQA (`autoRQA`)**, **Cross RQA (`cr
 |                 |              |             | - `'none'`: Do not generate plots.                              |
 |                 |              |             | - `'rp'`: Basic recurrence or cross-recurrence plot only.                              |
 |                 |              |             | - `'rp-timeseries'`: Plot the recurrence plot with the time series underneath or alongside. |
+|                 |              |             | - `'drp'`: Plot recurrence for each lag in a diagonal recurrence profile.
 | **`pointSize`** | `int`     | `4`      | Size of the points in the recurrence or cross-recurrence plot.                                           |
 | **`saveFig`** | `bool`     | `True`      | Whether to save the recurrence or cross-recurrence plot:                                             |
 |                 |              |             | - `True`: Save plot.                                                |
