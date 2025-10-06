@@ -39,7 +39,7 @@ def crossRQA(data1, data2, params):
     if 'rp' in params['plotMode']:
         save_path = None
         if params.get('saveFig', False):
-            save_path = os.path.join('images', 'rqa', f"crossRQA_plot.png")
+            save_path = os.path.join('figs', 'rqa', f"crossRQA_plot.png")
 
         plot_utils.plot_rqa_results(
             dataX=dataX1,

@@ -33,7 +33,7 @@ def autoRQA(data, params):
     if plot_mode in ('rp', 'rp-timeseries'):
         save_path = None
         if params.get('saveFig', False):
-            save_path = os.path.join('images', 'rqa', f"autoRQA_plot.png")
+            save_path = os.path.join('figs', 'rqa', f"autoRQA_plot.png")
         
 
         plot_utils.plot_rqa_results(

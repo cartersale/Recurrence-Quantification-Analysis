@@ -19,10 +19,11 @@ def plot_rqa_results(
 
     # === Recurrence Plot ===
     ax_rp = fig.add_subplot(gs[1, 1])
-    ax_rp.set_facecolor('#b0c4de')  # Light Steel Blue, a lighter navy shade
+    #ax_rp.set_facecolor('#b0c4de')  # Light Steel Blue, a lighter navy shade
+    ax_rp.set_facecolor('white')  # White background
 
     recur_y, recur_x = np.where(td == 1)
-    ax_rp.scatter(recur_x, recur_y, c='blue', s=point_size, edgecolors='none')
+    ax_rp.scatter(recur_x, recur_y, c='red', s=point_size, edgecolors='none')
     ax_rp.set_xlim([0, N])
     ax_rp.set_ylim([0, N])
     ax_rp.set_title("Cross-Recurrence Plot" if dataY is not None else "Recurrence Plot", pad=8)
@@ -56,12 +57,22 @@ def plot_rqa_results(
     else:
         fig.align_xlabels([ax_rp])
         fig.align_ylabels([ax_rp])
-    
+
     if save_path:
-       import os
-       os.makedirs(os.path.dirname(save_path), exist_ok=True)
-       plt.savefig(save_path, dpi=300, bbox_inches='tight')
-       print(f"Plot saved to: {save_path}")
+        import os
+        os.makedirs(os.path.dirname(save_path), exist_ok=True)
+        
+        # Determine file extension
+        file_ext = os.path.splitext(save_path)[1].lower()
+        
+        if file_ext == '.svg':
+            # Save as SVG with rasterized recurrence plot
+            plt.savefig(save_path, format='svg', bbox_inches='tight')
+        else:
+            # Save as raster format (PNG, etc.)
+            plt.savefig(save_path, dpi=300, bbox_inches='tight')
+        
+        print(f"Plot saved to: {save_path}")
 
     plt.show()
 
